@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class HomeScreen extends AppCompatActivity {
 
-    ImageButton timer, CDtimer;
+    ImageButton timer, CDtimer, PROFILE_1, PROFILE_2, PROFILE_3, PROFILE_4, PROFILE_5;
 
     public boolean mCDtimer;
 

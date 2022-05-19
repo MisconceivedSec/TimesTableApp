@@ -1,8 +1,6 @@
 package com.explorer.timestable;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.res.ResourcesCompat;
-
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -43,13 +41,12 @@ public class Times extends AppCompatActivity {
 
 
     //---VARIABLES---//
-
     public List Selected = new ArrayList();
     public List wrong = new ArrayList();
 
     public String newText;
     public String time;
-    public String wrongList;
+    public String wrong_list_string;
 
     public boolean firstWrong;
     public boolean canType;
@@ -61,10 +58,8 @@ public class Times extends AppCompatActivity {
     public Handler mHandler;
 
     public long tMilliSec, tStart, tBuff, tUpdate = 0L;
-    public long pauseOffset;
-    public long millsLeftTimer;
 
-    public long CD_time;
+    public int shortest_seconds_stopwatch;
 
     public static long START_TIME_IN_MILLIS;
 
@@ -75,7 +70,7 @@ public class Times extends AppCompatActivity {
     public long mTimeLeft;
 
     public float wrongCount;
-    public float totalTime;
+    public int totalTime;
 
     public int sec, min, milliSec;
     public int i;
@@ -86,7 +81,6 @@ public class Times extends AppCompatActivity {
     public int Multiplier;
     public int cran;
     public int UsAnswer;
-    public int seconds;
 
     public String Question;
     public int result;
@@ -223,9 +217,7 @@ public class Times extends AppCompatActivity {
 
     }
 
-
     public void StartUp() {
-
         SWtimer = getResources().getDrawable(R.drawable.timer);
 
         CDtimer = getResources().getDrawable(R.drawable.ic_sand_timer);
@@ -246,7 +238,6 @@ public class Times extends AppCompatActivity {
 
 
         START_TIME_IN_MILLIS = 60000 + 1000;
-
         mTimeLeft = START_TIME_IN_MILLIS;
 
         mHandler = new Handler();
@@ -306,7 +297,6 @@ public class Times extends AppCompatActivity {
         }
     }
 
-
     public void SetViews() {
 
         CDView = findViewById(R.id.CDTimer);
@@ -348,7 +338,6 @@ public class Times extends AppCompatActivity {
         next = findViewById(R.id.Next);
 
     }
-
 
     public void MoveOn() {
 
@@ -442,263 +431,270 @@ public class Times extends AppCompatActivity {
         }
     }
 
-        public void Next() {
+    public void Next() {
 
         Log.d("DEBUG", "Selected.size() = " + Selected.size());
-
         Log.d("DEBUG", "Nexting");
 
-            totalTime = min + (milliSec / 60);
+        totalTime = (min * 60) + sec;
 
-            if (!wrong.isEmpty()) {
+        Log.d("DEBUG", "total time: " + totalTime);
 
-                Collections.sort(wrong);
-
-//                wrongList = wrong.toString();
-//
-//                wrongList = wrongList.replaceAll("\\]", "").replaceAll("\\[", "");
-
-                wrongList = "";
-
-                if (!(wrong.size() == 1)) {
-
-                    wrongList = wrongList + wrong.get(0);
-
-                    for (int i = 1; i <= wrong.size() - 1; i++) {
-
-                        if (i != wrong.size() - 1) {
-                            wrongList = wrongList + ", " + wrong.get(i);
-                        } else {
-                            wrongList = wrongList + " and " + wrong.get(i);
-                        }
-                    }
-                } else wrongList = wrong.get(0).toString();
-
-            } else wrongList = "";
-
-            Log.d("Debug", "wrongList = " + wrongList);
-
-            wrongCount = 12 - rightCount;
-
-            result = Math.round(100 - ((wrongCount / 12) * 100));
-
-            Log.d("DEBUG", "Math = " + (wrongCount / 12));
-
-            Log.d("DEBUG", "Wrong count = " + wrongCount);
-
-            Log.d("DEBUG", "Right count = " + rightCount);
-
-            Log.d("DEBUG", "Result = " + result);
-
-            Intent intent = new Intent(this, Done.class);
-
-            intent.putExtra("WRONG_LIST", wrongList);
-
-            intent.putExtra("TIME", time);
-
-            intent.putExtra("RESULT", result);
-
-            intent.putExtra("NUM_CLICKED", SubjectNumber);
-
-            intent.putExtra("CD_TIMER", mCDtimer);
-
-            if (mCDtimer) {
-                intent.putExtra("WON", won);
-                time = CDView.getText().toString();
-
-            } else time = timer.getText().toString();
-
-            intent.putExtra("TIME", time);
-
-            Log.d("Debug", "Starting new activity");
-
-            startActivity(intent);
+        if(!mCDtimer) {
+            shortest_seconds_stopwatch = PrefConfig.retrieve_high_score(getApplicationContext());
+            if (shortest_seconds_stopwatch < totalTime) {
+                shortest_seconds_stopwatch = totalTime;
+                PrefConfig.store_high_score(getApplicationContext(), shortest_seconds_stopwatch);
+            }
         }
 
-        public void MainLoop() {
+        if (!wrong.isEmpty()) {
 
-            incorrect = false;
+            Collections.sort(wrong);
 
-            Input.setText("");
+            wrong_list_string = "";
+
+            if (!(wrong.size() == 1)) {
+
+                wrong_list_string = wrong_list_string + wrong.get(0);
+
+                for (int i = 1; i <= wrong.size() - 1; i++) {
+
+                    if (i != wrong.size() - 1) {
+                        wrong_list_string = wrong_list_string + ", " + wrong.get(i);
+                    } else {
+                        wrong_list_string = wrong_list_string + " and " + wrong.get(i);
+                    }
+                }
+            } else wrong_list_string = wrong.get(0).toString();
+
+        } else wrong_list_string = "";
+
+        Log.d("Debug", "wrongList = " + wrong_list_string);
+
+        wrongCount = 12 - rightCount;
+
+        result = Math.round(100 - ((wrongCount / 12) * 100));
+
+        Log.d("DEBUG", "Math = " + (wrongCount / 12));
+
+        Log.d("DEBUG", "Wrong count = " + wrongCount);
+
+        Log.d("DEBUG", "Right count = " + rightCount);
+
+        Log.d("DEBUG", "Result = " + result);
+
+        Intent intent = new Intent(this, Done.class);
+
+        intent.putExtra("SHORTEST_TIME", shortest_seconds_stopwatch);
+
+        intent.putExtra("WRONG_LIST", wrong_list_string);
+
+        intent.putExtra("TIME", time);
+
+        intent.putExtra("RESULT", result);
+
+        intent.putExtra("NUM_CLICKED", SubjectNumber);
+
+        intent.putExtra("CD_TIMER", mCDtimer);
+
+        if (mCDtimer) {
+            intent.putExtra("WON", won);
+            time = CDView.getText().toString();
+
+        } else time = timer.getText().toString();
+
+        intent.putExtra("TIME", time);
+
+        Log.d("Debug", "Starting new activity");
+
+        startActivity(intent);
+    }
+
+    public void MainLoop() {
+
+        incorrect = false;
+
+        Input.setText("");
+
+        RanInt = (int) (Math.random() * (13 - 2 + 1) + 2);
+
+        while (Selected.contains(RanInt)) {
 
             RanInt = (int) (Math.random() * (13 - 2 + 1) + 2);
 
-            while (Selected.contains(RanInt)) {
+        }
 
-                RanInt = (int) (Math.random() * (13 - 2 + 1) + 2);
+        Log.v("Debug", "RanInt = " + RanInt);
+
+        Selected.add(RanInt);
+
+        Multiplier = RanInt;
+
+        cran = SubjectNumber * Multiplier;
+
+        Log.v("Debug", "cran = " + cran);
+
+        Question = " " + SubjectNumber + " × " + Multiplier + " = ";
+
+        OutputQuestion.setText(Question);
+
+    }
+
+    public void setButtons () {
+
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { Next(); }});
+
+        done.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (Input != null && Input.length() > 0 ) {
+
+                    MoveOn();
+
+                }
+            }
+        });
+
+        clear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (Input != null && Input.length() > 0) {
+                    Input.setText("");
+                }
+            }
+        });
+
+        del.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                newText = Input.getText().toString();
+
+                Log.v("Debug", "newText before = " + newText);
+
+                if (newText != null && newText.length() > 0) {
+
+                    newText = newText.substring(0, newText.length() - 1);
+
+                }
+
+                Log.v("Debug", "newText after = " + newText);
+
+                Input.setText(newText);
+            }
+        });
+
+
+        but0.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+
+                    if (canType) {Input.append("0");}
 
             }
+        });
 
-            Log.v("Debug", "RanInt = " + RanInt);
 
-            Selected.add(RanInt);
+        but1.setOnClickListener(new View.OnClickListener() {
 
-            Multiplier = RanInt;
+            @Override
+            public void onClick(View view) {
 
-            cran = SubjectNumber * Multiplier;
+                if (canType) {Input.append("1");}
 
-            Log.v("Debug", "cran = " + cran);
+            }
+        });
 
-            Question = " " + SubjectNumber + " × " + Multiplier + " = ";
 
-            OutputQuestion.setText(Question);
+        but2.setOnClickListener(new View.OnClickListener() {
 
-   }
+            @Override
+            public void onClick(View view) {
 
-        public void setButtons () {
+                if (canType) {Input.append("2");}
 
-            next.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) { Next(); }});
+            }
+        });
 
-            done.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
 
-                    if (Input != null && Input.length() > 0 ) {
+        but3.setOnClickListener(new View.OnClickListener() {
 
-                        MoveOn();
+            @Override
+            public void onClick(View view) {
 
-                    }
-                }
-            });
+                if (canType) {Input.append("3");}
 
-            clear.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (Input != null && Input.length() > 0) {
-                        Input.setText("");
-                    }
-                }
-            });
+            }
+        });
 
-            del.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    newText = Input.getText().toString();
 
-                    Log.v("Debug", "newText before = " + newText);
+        but4.setOnClickListener(new View.OnClickListener() {
 
-                    if (newText != null && newText.length() > 0) {
+            @Override
+            public void onClick(View view) {
 
-                        newText = newText.substring(0, newText.length() - 1);
+                if (canType) {Input.append("4");}
 
-                    }
+            }
+        });
 
-                    Log.v("Debug", "newText after = " + newText);
 
-                    Input.setText(newText);
-                }
-            });
+        but5.setOnClickListener(new View.OnClickListener() {
 
-            
-            but0.setOnClickListener(new View.OnClickListener() {
-                
-                @Override
-                public void onClick(View view) {
+            @Override
+            public void onClick(View view) {
 
-                        if (canType) {Input.append("0");}
+                if (canType) {Input.append("5");}
 
-                }
-            });
+            }
+        });
 
-            
-            but1.setOnClickListener(new View.OnClickListener() {
-                
-                @Override
-                public void onClick(View view) {
-                                        
-                    if (canType) {Input.append("1");}
 
-                }
-            });
+        but6.setOnClickListener(new View.OnClickListener() {
 
-            
-            but2.setOnClickListener(new View.OnClickListener() {
-                
-                @Override
-                public void onClick(View view) {
+            @Override
+            public void onClick(View view) {
 
-                    if (canType) {Input.append("2");}
+                if (canType) {Input.append("6");}
 
-                }
-            });
+            }
+        });
 
-            
-            but3.setOnClickListener(new View.OnClickListener() {
-                
-                @Override
-                public void onClick(View view) {
-                                        
-                    if (canType) {Input.append("3");}
 
-                }
-            });
+        but7.setOnClickListener(new View.OnClickListener() {
 
-            
-            but4.setOnClickListener(new View.OnClickListener() {
-                
-                @Override
-                public void onClick(View view) {
-                                        
-                    if (canType) {Input.append("4");}
+            @Override
+            public void onClick(View view) {
 
-                }
-            });
+                if (canType) {Input.append("7");}
 
-            
-            but5.setOnClickListener(new View.OnClickListener() {
-                
-                @Override
-                public void onClick(View view) {
-                                        
-                    if (canType) {Input.append("5");}
+            }
+        });
 
-                }
-            });
 
-            
-            but6.setOnClickListener(new View.OnClickListener() {
-                
-                @Override
-                public void onClick(View view) {
-                                        
-                    if (canType) {Input.append("6");}
+        but8.setOnClickListener(new View.OnClickListener() {
 
-                }
-            });
+            @Override
+            public void onClick(View view) {
 
-            
-            but7.setOnClickListener(new View.OnClickListener() {
-                
-                @Override
-                public void onClick(View view) {
-                                        
-                    if (canType) {Input.append("7");}
+                if (canType) {Input.append("8");}
 
-                }
-            });
+            }
+        });
 
-            
-            but8.setOnClickListener(new View.OnClickListener() {
-                
-                @Override
-                public void onClick(View view) {
-                                        
-                    if (canType) {Input.append("8");}
 
-                }
-            });
+        but9.setOnClickListener(new View.OnClickListener() {
 
-            
-            but9.setOnClickListener(new View.OnClickListener() {
-                
-                @Override
-                public void onClick(View view) {
-                                        
-                    if (canType) {Input.append("9");}
+            @Override
+            public void onClick(View view) {
 
-                }
-            });
-        }
+                if (canType) {Input.append("9");}
+
+            }
+        });
+    }
 }

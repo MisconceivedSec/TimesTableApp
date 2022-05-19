@@ -50,7 +50,7 @@
                     android:fontFamily="@font/autour_one"
                     android:text="Next"
                     android:textSize="@dimen/_10sdp"
-                    android:visibility="gone"
+                    android:visibility="visible"
                     app:layout_constraintBottom_toTopOf="@+id/tableLayout"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.498"
