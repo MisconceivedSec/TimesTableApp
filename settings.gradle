@@ -1,2 +1,2 @@
 include ':app'
-rootProject.name = "Times App"
+rootProject.name = "Times Table Explorer"

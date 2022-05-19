@@ -12,18 +12,17 @@ import java.util.List;
 
 public class Done extends AppCompatActivity {
 
+    public boolean won, CDTimer;
+
     public List wrong = new ArrayList();
 
     public int subjectNum;
 
-    public String mResult;
+    public int mResult;
     public String mTime;
     public String mWrongList;
 
-    public TextView WrongList;
-    public TextView wrongCountTV;
-    public TextView Time;
-    public TextView message;
+    public TextView WrongList, score, Time, message, result_time;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,9 +31,13 @@ public class Done extends AppCompatActivity {
 
         setContentView(R.layout.activity_done);
 
+        CDTimer = getIntent().getBooleanExtra("CD_TIMER", Boolean.parseBoolean("0"));
+
+        won = getIntent().getBooleanExtra("WON", Boolean.parseBoolean("0"));
+
         mWrongList = getIntent().getStringExtra("WRONG_LIST");
 
-        mResult = getIntent().getStringExtra("RESULT");
+        mResult = getIntent().getIntExtra("RESULT", 0);
 
         mTime = getIntent().getStringExtra("TIME");
 
@@ -42,9 +45,11 @@ public class Done extends AppCompatActivity {
 
         Log.d("DEBUG", "mResult = " + mResult);
 
+        result_time = findViewById(R.id.Result_Time);
+
         WrongList = findViewById(R.id.WrongList);
 
-        wrongCountTV = findViewById(R.id.Result);
+        score = findViewById(R.id.score);
 
         Time = findViewById(R.id.Time);
 
@@ -52,26 +57,74 @@ public class Done extends AppCompatActivity {
 
         Log.d("DEBUG", "wrong count text = " + mResult);
 
-        wrongCountTV.setText(mResult);
-
-        Time.setText(mTime);
-
         Log.d("DEBUG", "mWrongList = " + mWrongList);
+
+        if (CDTimer) CD();
+        else SW();
 
         if ((mWrongList.equals(""))) {
 
-            Log.d("DEBUG", "mWrongList == '' is " + (mWrongList.equals("")));
+            Log.d("DEBUG", "mWrongList == '' is true");
 
-            message.setVisibility(View.INVISIBLE);
-
-        } else {
-
-            WrongList.setText(mWrongList);
+            WrongList.setVisibility(View.GONE);
 
             message.setVisibility(View.GONE);
 
-            message.setText("Practice these numbers in the " + subjectNum + " times table:");
+        } else if (mWrongList.length() > 1) {
 
+            WrongList.setVisibility(View.VISIBLE);
+
+            message.setVisibility(View.VISIBLE);
+
+            WrongList.setText(mWrongList);
+
+            message.setText("The numbers to practice:");
+
+        } else {
+            WrongList.setVisibility(View.VISIBLE);
+
+            message.setVisibility(View.VISIBLE);
+
+            WrongList.setText(mWrongList);
+
+            message.setText("The number to practice:");
         }
+    }
+
+    public void CD() {
+
+        score.setText(mResult + "%");
+
+        Time.setText("Remaining time: " + mTime);
+
+        if (won && mResult >= 90) {
+            result_time.setText("Superb!");
+        } else if (won && mResult < 90 && mResult >= 60) {
+            result_time.setText("Not bad :)");
+        } else if (won && mResult < 60 && mResult >= 40) {
+            result_time.setText("Maybe some more practice?");
+        } else if (won && mResult < 40) {
+            result_time.setText("Try again :(");
+        } else result_time.setText("Work on your speed!");
+
+
+    }
+
+    public void SW() {
+
+        score.setText(mResult + "%");
+
+        Time.setText("Your time: " + mTime);
+
+        if (mResult >= 90) {
+            result_time.setText("Superb!");
+        } else if (mResult < 90 && mResult >= 60) {
+            result_time.setText("Not bad :)");
+        } else if (mResult < 60 && mResult >= 40) {
+            result_time.setText("Maybe some more practice?");
+        } else if (mResult < 40) {
+            result_time.setText("Try again :(");
+        }
+
     }
 }

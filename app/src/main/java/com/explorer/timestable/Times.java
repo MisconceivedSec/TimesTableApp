@@ -1,20 +1,25 @@
 package com.explorer.timestable;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
+
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.ImageView;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 
 public class Times extends AppCompatActivity {
@@ -49,13 +54,25 @@ public class Times extends AppCompatActivity {
     public boolean firstWrong;
     public boolean canType;
     public boolean incorrect;
-
+    public boolean mCDtimer;
     public boolean isResume;
+    public boolean won;
 
     public Handler mHandler;
 
     public long tMilliSec, tStart, tBuff, tUpdate = 0L;
     public long pauseOffset;
+    public long millsLeftTimer;
+
+    public long CD_time;
+
+    public static long START_TIME_IN_MILLIS;
+
+    public CountDownTimer CDTimer;
+
+    public boolean TimerRunning;
+
+    public long mTimeLeft;
 
     public float wrongCount;
     public float totalTime;
@@ -69,17 +86,21 @@ public class Times extends AppCompatActivity {
     public int Multiplier;
     public int cran;
     public int UsAnswer;
+    public int seconds;
 
     public String Question;
-    public String result;
+    public int result;
 
     //---VIEWS---//
 
     Chronometer timer;
 
+    CountDownTimer cTimer = null;
+
     TextView Input;
     TextView OutputQuestion;
     TextView feedback;
+    TextView CDView;
 
     Button clear;
     Button done;
@@ -96,9 +117,42 @@ public class Times extends AppCompatActivity {
     Button del;
     Button next;
 
+    public Drawable SWtimer, CDtimer;
+    ImageView mType;
 
 
     //---FUNCTIONS---//
+
+    public void runSTPW() {
+
+        if (!isResume) {
+
+            tStart = SystemClock.uptimeMillis();
+
+            mHandler.postDelayed(runnable, 0);
+
+            timer.start();
+
+            isResume = true;
+
+        }
+    }
+
+    public void pauseSTPW() {
+
+        if (isResume) {
+
+            tBuff += tMilliSec;
+
+            mHandler.removeCallbacks(runnable);
+
+            timer.stop();
+
+            isResume = false;
+
+        }
+
+    }
 
     public Runnable runnable = new Runnable() {
         @Override
@@ -114,33 +168,90 @@ public class Times extends AppCompatActivity {
 
             sec = sec % 60;
 
-            milliSec = (int) ( tUpdate % 100 );
+            milliSec = (int) ( tUpdate / 10 );
 
-            timer.setText(String.format("%02d", min) + ":"
-                    + String.format("%02d", sec));
-//                    + ":" + String.format("%02d", milliSec)
+            timer.setText(String.format("%02d", min) + ":" + String.format("%02d", sec));
 
             mHandler.postDelayed(this, 60);
 
         }
     };
 
-    public void plTimer() {
+    public void runTimer() {
+        if (TimerRunning) {
+            pauseTimer();
+        } else {
+            startTimer();
+        }
+    }
 
-        tStart = SystemClock.uptimeMillis();
+    public void startTimer() {
+        CDTimer = new CountDownTimer(mTimeLeft, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                mTimeLeft = millisUntilFinished;
+                updateCountdownText();
+            }
 
-        mHandler.postDelayed(runnable, 0);
+            @Override
+            public void onFinish() {
+                if (!won) {
+                    TimerRunning = false;
+                    won = false;
+                    Next();
+                }
+            }
+        }.start();
 
-        timer.start();
+        TimerRunning = true;
+    }
+
+    public void updateCountdownText() {
+        int minutes = (int) (mTimeLeft / 1000) / 60;
+        int seconds = (int) (mTimeLeft / 1000) % 60;
+
+        String timeLeftFormatted = String.format(Locale.getDefault(),"%02d:%02d", minutes, seconds);
+
+        CDView.setText(timeLeftFormatted);
+
+    }
+
+    public void pauseTimer() {
+
+        CDTimer.cancel();
+        TimerRunning = false;
 
     }
 
 
     public void StartUp() {
 
+        SWtimer = getResources().getDrawable(R.drawable.timer);
+
+        CDtimer = getResources().getDrawable(R.drawable.ic_sand_timer);
+
+        mType = findViewById(R.id.type);
+
+        mCDtimer = getIntent().getBooleanExtra("CD_TIMER", Boolean.parseBoolean("0"));
+
+        if (mCDtimer) {
+
+            mType.setImageDrawable(CDtimer);
+
+        } else {
+
+            mType.setImageDrawable(SWtimer);
+
+        }
+
+
+        START_TIME_IN_MILLIS = 60000 + 1000;
+
+        mTimeLeft = START_TIME_IN_MILLIS;
+
         mHandler = new Handler();
 
-        result = "";
+        result = 0;
 
         canType = true;
 
@@ -160,23 +271,47 @@ public class Times extends AppCompatActivity {
 
         Log.v("Debug", "You chose the number " + SubjectNumber);
 
-        final Handler handler = new Handler();
+        if (mCDtimer) {
 
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
+            CDView.setVisibility(View.VISIBLE);
+            timer.setVisibility(View.GONE);
 
-                plTimer();
+            final Handler handler = new Handler();
 
-            }
-        }, aniTrans);
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
 
+                    runTimer();
+
+                }
+            }, aniTrans);
+
+        } else {
+
+            timer.setVisibility(View.VISIBLE);
+            CDView.setVisibility(View.GONE);
+
+            final Handler handler = new Handler();
+
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    runSTPW();
+
+                }
+            }, aniTrans);
+
+        }
     }
 
 
     public void SetViews() {
 
-        timer = findViewById(R.id.timer);
+        CDView = findViewById(R.id.CDTimer);
+
+        timer = findViewById(R.id.SWtimer);
 
         OutputQuestion = findViewById(R.id.OutputQuest);
 
@@ -261,7 +396,7 @@ public class Times extends AppCompatActivity {
 
         } else {
 
-            if (!incorrect) { rightCount++; }
+            if (!incorrect) {rightCount++;}
 
             i++;
 
@@ -288,6 +423,12 @@ public class Times extends AppCompatActivity {
 
                     if (Selected.size() == 12) {
 
+                        if (mCDtimer && mTimeLeft > 0) {
+
+                            won = true;
+
+                        }
+
                         Next();
 
                     } else MainLoop();
@@ -303,25 +444,43 @@ public class Times extends AppCompatActivity {
 
         public void Next() {
 
+        Log.d("DEBUG", "Selected.size() = " + Selected.size());
+
+        Log.d("DEBUG", "Nexting");
+
             totalTime = min + (milliSec / 60);
 
             if (!wrong.isEmpty()) {
 
                 Collections.sort(wrong);
 
-                wrongList = wrong.toString();
+//                wrongList = wrong.toString();
+//
+//                wrongList = wrongList.replaceAll("\\]", "").replaceAll("\\[", "");
 
-                wrongList = wrongList.replaceAll("\\]", "").replaceAll("\\[", "");
+                wrongList = "";
+
+                if (!(wrong.size() == 1)) {
+
+                    wrongList = wrongList + wrong.get(0);
+
+                    for (int i = 1; i <= wrong.size() - 1; i++) {
+
+                        if (i != wrong.size() - 1) {
+                            wrongList = wrongList + ", " + wrong.get(i);
+                        } else {
+                            wrongList = wrongList + " and " + wrong.get(i);
+                        }
+                    }
+                } else wrongList = wrong.get(0).toString();
 
             } else wrongList = "";
 
             Log.d("Debug", "wrongList = " + wrongList);
 
-            time = timer.getText().toString();
-
             wrongCount = 12 - rightCount;
 
-            result = String.valueOf(Math.round(100 - ((wrongCount / 12) * 100))) + "%";
+            result = Math.round(100 - ((wrongCount / 12) * 100));
 
             Log.d("DEBUG", "Math = " + (wrongCount / 12));
 
@@ -340,6 +499,16 @@ public class Times extends AppCompatActivity {
             intent.putExtra("RESULT", result);
 
             intent.putExtra("NUM_CLICKED", SubjectNumber);
+
+            intent.putExtra("CD_TIMER", mCDtimer);
+
+            if (mCDtimer) {
+                intent.putExtra("WON", won);
+                time = CDView.getText().toString();
+
+            } else time = timer.getText().toString();
+
+            intent.putExtra("TIME", time);
 
             Log.d("Debug", "Starting new activity");
 
@@ -380,8 +549,7 @@ public class Times extends AppCompatActivity {
 
             next.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v) { Next(); }
-            });
+                public void onClick(View v) { Next(); }});
 
             done.setOnClickListener(new View.OnClickListener() {
                 @Override

@@ -2,6 +2,7 @@ package com.explorer.timestable;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -9,22 +10,19 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    Animation plus1, plus2, minus1, minus2;
-
-    boolean aniRunning;
-
     int selectedNum;
 
-    TextView selectedNumTv;
+    boolean mCDtimer;
 
-    ImageButton mPlus;
-    ImageButton mMinus;
-    ImageButton mPlay;
+    ImageView mType;
+
+    Drawable CDtimer, SWtimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,22 +30,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        aniRunning = false;
-        selectedNumTv = findViewById(R.id.curNum);
-        mPlus = findViewById(R.id.plus);
-        mMinus = findViewById(R.id.minus);
-        mPlay = findViewById(R.id.play);
+        SWtimer = getResources().getDrawable(R.drawable.timer);
 
-        selectedNumTv.setText("2");
-        selectedNum = Integer.parseInt(selectedNumTv.getText().toString());
+        CDtimer = getResources().getDrawable(R.drawable.ic_sand_timer);
 
-        plus1 = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.plus1);
-        plus2 = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.plus2);
-        minus1 = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.minus1);
-        minus2 = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.minus2);
-        buttons();
+        mType = findViewById(R.id.type);
 
+        mCDtimer = getIntent().getBooleanExtra("TYPE", Boolean.parseBoolean("0"));
 
+        if (mCDtimer) {
+
+            mType.setImageDrawable(CDtimer);
+
+        } else {
+
+            mType.setImageDrawable(SWtimer);
+
+        }
 
         setButtons();
 
@@ -57,113 +56,11 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, Times.class);
 
         intent.putExtra("SELECTED_NUM", selectedNum);
+        intent.putExtra("CD_TIMER", mCDtimer);
 
         startActivity(intent);
     }
 
-    public void buttons() {
-
-        mPlay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                openTestPage();
-
-            }
-        });
-
-        mPlus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (selectedNum != 13 && !aniRunning) {
-
-                    aniRunning = true;
-
-                    selectedNum++;
-
-                    selectedNumTv.startAnimation(plus1);
-
-                    final Handler handler = new Handler();
-
-                    handler.postDelayed(new Runnable() {
-
-                        @Override
-                        public void run() {
-
-                            selectedNumTv.setText(String.valueOf(selectedNum));
-
-                        }
-                    }, 250);
-
-                    handler.postDelayed(new Runnable() {
-
-                        @Override
-                        public void run() {
-
-                            selectedNumTv.startAnimation(plus2);
-
-                        }
-                    }, 250);
-
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            aniRunning = false;
-                        }
-                    }, 250);
-                }
-            }
-        });
-
-        mMinus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (selectedNum != 2 && !aniRunning) {
-
-                    aniRunning = true;
-
-                    selectedNum--;
-
-                    selectedNumTv.startAnimation(minus1);
-
-                    final Handler handler = new Handler();
-
-                    handler.postDelayed(new Runnable() {
-
-                        @Override
-                        public void run() {
-
-                            selectedNumTv.setText(String.valueOf(selectedNum));
-
-                        }
-                    }, 250);
-
-                    handler.postDelayed(new Runnable() {
-
-                        @Override
-                        public void run() {
-
-                            selectedNumTv.startAnimation(minus2);
-
-                        }
-                    }, 250);
-
-
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            aniRunning = false;
-                        }
-                    }, 250);
-
-                }
-            }
-        });
-
-
-    }
 
     public void setButtons() {
         Button button2 = findViewById(R.id.button2);
@@ -321,18 +218,5 @@ public class MainActivity extends AppCompatActivity {
                 openTestPage();
             }
         });
-
-        button2.setVisibility(View.GONE);
-        button3.setVisibility(View.GONE);
-        button4.setVisibility(View.GONE);
-        button5.setVisibility(View.GONE);
-        button6.setVisibility(View.GONE);
-        button7.setVisibility(View.GONE);
-        button8.setVisibility(View.GONE);
-        button9.setVisibility(View.GONE);
-        button10.setVisibility(View.GONE);
-        button11.setVisibility(View.GONE);
-        button12.setVisibility(View.GONE);
-        button13.setVisibility(View.GONE);
     }
 }
