@@ -8,6 +8,7 @@
 
 
     <TableLayout
+        android:id="@+id/tableLayout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -15,15 +16,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/Instructions"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Choose the number you want to practice your times tables with....."
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textSize="36sp" />
 
         <TableRow
             android:layout_width="match_parent"
@@ -36,7 +28,8 @@
                 android:layout_height="wrap_content"
                 android:text="3"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:visibility="gone" />
 
             <Button
                 android:id="@+id/button4"
@@ -44,7 +37,8 @@
                 android:layout_height="wrap_content"
                 android:text="4"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:visibility="gone" />
 
             <Button
                 android:id="@+id/button2"
@@ -52,7 +46,8 @@
                 android:layout_height="wrap_content"
                 android:text="2"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:visibility="gone" />
         </TableRow>
 
         <TableRow
@@ -66,7 +61,8 @@
                 android:layout_height="wrap_content"
                 android:text="7"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:visibility="gone" />
 
             <Button
                 android:id="@+id/button5"
@@ -74,7 +70,8 @@
                 android:layout_height="wrap_content"
                 android:text="5"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:visibility="gone" />
 
             <Button
                 android:id="@+id/button6"
@@ -82,7 +79,8 @@
                 android:layout_height="wrap_content"
                 android:text="6"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:visibility="gone" />
         </TableRow>
 
         <TableRow
@@ -96,7 +94,8 @@
                 android:layout_height="wrap_content"
                 android:text="9"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:visibility="gone" />
 
             <Button
                 android:id="@+id/button8"
@@ -104,7 +103,8 @@
                 android:layout_height="wrap_content"
                 android:text="8"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:visibility="gone" />
 
             <Button
                 android:id="@+id/button0"
@@ -112,7 +112,8 @@
                 android:layout_height="wrap_content"
                 android:text="10"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:visibility="gone" />
         </TableRow>
 
         <TableRow
@@ -129,7 +130,8 @@
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/button12"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                tools:visibility="gone" />
 
             <Button
                 android:id="@+id/button12"
@@ -140,7 +142,8 @@
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                tools:visibility="gone" />
 
             <Button
                 android:id="@+id/button13"
@@ -151,8 +154,67 @@
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/button12" />
+                app:layout_constraintStart_toEndOf="@+id/button12"
+                tools:visibility="gone" />
         </TableRow>
     </TableLayout>
+
+    <ImageButton
+        android:id="@+id/play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/play"
+        app:layout_constraintBottom_toTopOf="@+id/curNum"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Instructions"
+        app:layout_constraintVertical_bias="0.463" />
+
+    <TextView
+        android:id="@+id/Instructions"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="92dp"
+        android:gravity="center"
+        android:text="Choose the number you want to practice your times tables with....."
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textSize="@dimen/_26sdp"
+        app:layout_constraintBottom_toBottomOf="@+id/tableLayout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/curNum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:text="0"
+        android:textSize="@dimen/_70sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tableLayout2" />
+
+    <ImageButton
+        android:id="@+id/plus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/arrow_right"
+        app:layout_constraintBottom_toBottomOf="@+id/curNum"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/curNum"
+        app:layout_constraintTop_toTopOf="@+id/curNum" />
+
+    <ImageButton
+        android:id="@+id/minus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/arrow_left"
+        app:layout_constraintBottom_toBottomOf="@+id/curNum"
+        app:layout_constraintEnd_toStartOf="@+id/curNum"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/curNum" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
